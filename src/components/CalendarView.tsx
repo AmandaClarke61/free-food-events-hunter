@@ -21,7 +21,7 @@ function toDateKey(d: Date) {
 
 export function CalendarView() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const _router = useRouter();
 
   // Determine initial month from date param or today
   const dateParam = searchParams.get("date");
