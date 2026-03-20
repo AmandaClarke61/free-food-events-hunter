@@ -52,6 +52,7 @@ model User {
   email        String     @unique
   passwordHash String
   name         String?
+  interests    String?    // JSON array of topic strings
   verified     Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
