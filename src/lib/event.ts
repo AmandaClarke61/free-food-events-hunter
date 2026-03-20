@@ -13,4 +13,5 @@ export interface EventDTO {
   topics: string[];
   sources: string[];
   isBookmarked?: boolean;
+  score?: number;
 }
