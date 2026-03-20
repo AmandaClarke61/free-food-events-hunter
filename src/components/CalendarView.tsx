@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { EventCard } from "./EventCard";
 import type { EventDTO } from "@/lib/event";
 
@@ -21,7 +21,6 @@ function toDateKey(d: Date) {
 
 export function CalendarView() {
   const searchParams = useSearchParams();
-  const _router = useRouter();
 
   // Determine initial month from date param or today
   const dateParam = searchParams.get("date");
