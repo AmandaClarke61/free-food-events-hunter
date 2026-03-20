@@ -1,0 +1,92 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime?
+  location    String?
+  url         String?
+  imageUrl    String?
+
+  hasFreeFood    Boolean @default(false)
+  foodConfidence Float   @default(0) // 0-1, how confident we are about free food
+  foodDetails    String? // e.g. "Pizza and drinks provided"
+
+  topics String? // JSON array of topic strings
+
+  fingerprint String  @unique // For dedup: hash of title+date
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sources   EventSource[]
+  bookmarks Bookmark[]
+
+  @@index([startTime])
+  @@index([hasFreeFood, startTime])
+}
+
+model EventSource {
+  id        String @id @default(cuid())
+  eventId   String
+  source    String // "localist" | "campusgroups" | "gsc"
+  sourceId  String? // Original ID from the source
+  rawData   String? // JSON blob of original data
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([source, sourceId])
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String?
+  verified     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  bookmarks    Bookmark[]
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([userId])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model PipelineRun {
+  id         String   @id @default(cuid())
+  source     String
+  status     String   // "running" | "success" | "error"
+  eventsFound Int     @default(0)
+  eventsNew   Int     @default(0)
+  error       String?
+  startedAt   DateTime @default(now())
+  finishedAt  DateTime?
+}
