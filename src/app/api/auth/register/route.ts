@@ -29,17 +29,33 @@ export async function POST(request: NextRequest) {
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
+    if (existing && existing.verified) {
       return NextResponse.json(
         { error: "An account with this email already exists" },
         { status: 409 }
       );
     }
 
-    const passwordHash = await hashPassword(password);
-    await prisma.user.create({
-      data: { email, passwordHash, name: name || null },
+    // Rate limit: check for recent verification code
+    const recentCode = await prisma.verificationCode.findFirst({
+      where: {
+        email,
+        createdAt: { gt: new Date(Date.now() - 5 * 60 * 1000) },
+      },
     });
+    if (recentCode) {
+      return NextResponse.json(
+        { error: "Verification code already sent. Please check your email or wait 5 minutes." },
+        { status: 429 }
+      );
+    }
+
+    if (!existing) {
+      const passwordHash = await hashPassword(password);
+      await prisma.user.create({
+        data: { email, passwordHash, name: name || null },
+      });
+    }
 
     // Generate 6-digit verification code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
