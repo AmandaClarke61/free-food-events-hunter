@@ -15,6 +15,8 @@ model User {
 }
 ```
 
+After adding the field, run: `npx prisma db push` (SQLite, nullable field — no data migration needed).
+
 No new tables. Implicit signals are derived at query time from the existing `Bookmark` + `Event.topics` data.
 
 ## Scoring Logic (`recommend/score.ts`)
@@ -73,7 +75,8 @@ New route file: `src/app/api/user/interests/route.ts`
   6. Slice in application code for pagination (`offset` / `limit`)
   7. Return paginated results
 - Response: same as existing `/api/events` format, plus `score: number` on each event. Add optional `score` field to event type in `src/lib/event.ts`.
-- When `forYou=true`: topic filter param is ignored (recommendations are multi-topic by nature). Other filters (search, date, freeFood) still apply.
+- When `forYou=true`: topic filter param is ignored (recommendations are multi-topic by nature); `upcoming` param is also ignored (always treated as true). Other filters (search, date, freeFood) still apply.
+- `foodConfidence` is used server-side only (from the Prisma model) for scoring. It does not need to appear in the client-facing `EventDTO`.
 
 Note: In-memory pagination is fine for this dataset size (hundreds of events, not thousands).
 
