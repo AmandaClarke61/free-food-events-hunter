@@ -51,6 +51,7 @@ export function EventCard({ event }: { event: EventDTO }) {
           <img
             src={event.imageUrl}
             alt=""
+            loading="lazy"
             className="h-20 w-20 rounded-md object-cover flex-shrink-0"
           />
         )}
