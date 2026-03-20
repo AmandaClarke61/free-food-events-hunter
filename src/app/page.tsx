@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { EventsView } from "@/components/EventsView";
+import { SkeletonCard } from "@/components/SkeletonCard";
 
 export default function HomePage() {
   return (
@@ -12,7 +13,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      <Suspense>
+      <Suspense fallback={<SkeletonCard count={6} />}>
         <FilterBar />
         <EventsView />
       </Suspense>

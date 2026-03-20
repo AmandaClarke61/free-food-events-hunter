@@ -3,23 +3,9 @@
 import { useEffect, useState } from "react";
 import { EventCard } from "@/components/EventCard";
 import type { EventDTO } from "@/lib/event";
+import { SkeletonCard } from "@/components/SkeletonCard";
 
 const PAGE_SIZE = 20;
-
-function SkeletonCard() {
-  return (
-    <div className="animate-pulse rounded-lg border border-gray-200 bg-white p-4">
-      <div className="flex gap-3">
-        <div className="h-20 w-20 rounded-md bg-gray-200 flex-shrink-0" />
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="h-4 w-3/4 rounded bg-gray-200" />
-          <div className="h-3 w-1/2 rounded bg-gray-200" />
-          <div className="h-3 w-full rounded bg-gray-200" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function FreeFoodEventFeedClient() {
   const [events, setEvents] = useState<EventDTO[]>([]);
@@ -49,13 +35,7 @@ export function FreeFoodEventFeedClient() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-3">
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
-      </div>
-    );
+    return <SkeletonCard count={3} />;
   }
 
   if (events.length === 0) {

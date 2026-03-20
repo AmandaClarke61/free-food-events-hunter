@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { FreeFoodEventFeedClient } from "./client";
+import { SkeletonCard } from "@/components/SkeletonCard";
 
 export default function FreeFoodPage() {
   return (
@@ -11,7 +12,7 @@ export default function FreeFoodPage() {
         </p>
       </div>
 
-      <Suspense>
+      <Suspense fallback={<SkeletonCard count={6} />}>
         <FreeFoodEventFeedClient />
       </Suspense>
     </div>
