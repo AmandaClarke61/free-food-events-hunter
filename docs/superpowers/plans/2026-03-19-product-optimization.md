@@ -71,14 +71,24 @@ git commit -m "fix: require JWT_SECRET in production environment"
 ### Task 2: Email Verification Rate Limiting
 
 **Files:**
-- Modify: `src/app/api/auth/register/route.ts:44-52`
+- Modify: `src/app/api/auth/register/route.ts`
 
-- [ ] **Step 1: Add rate limit check before deleteMany**
+**Context:** The current register route returns 409 if the user already exists, which means the rate-limit code placed after `user.create()` would never fire on repeated requests. The fix is to restructure the route so that if a user exists but is **unverified**, we re-send the verification code (with rate limiting) instead of returning 409.
 
-In `src/app/api/auth/register/route.ts`, insert the following code **after** line 42 (`await prisma.user.create(...)`) and **before** line 44 (`const code = ...`):
+- [ ] **Step 1: Restructure the existing user check and add rate limiting**
+
+In `src/app/api/auth/register/route.ts`, replace the existing user check block (lines 31-37) and the code generation block (lines 44-52) with the following restructured logic:
 
 ```ts
-    // Rate limit: check for existing unexpired code
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.verified) {
+      return NextResponse.json(
+        { error: "An account with this email already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Rate limit: check for recent verification code (regardless of new/existing user)
     const recentCode = await prisma.verificationCode.findFirst({
       where: {
         email,
@@ -91,13 +101,31 @@ In `src/app/api/auth/register/route.ts`, insert the following code **after** lin
         { status: 429 }
       );
     }
+
+    if (!existing) {
+      // New user: create account
+      const passwordHash = await hashPassword(password);
+      await prisma.user.create({
+        data: { email, passwordHash, name: name || null },
+      });
+    }
+
+    // Generate 6-digit verification code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Delete any existing codes for this email
+    await prisma.verificationCode.deleteMany({ where: { email } });
+    await prisma.verificationCode.create({
+      data: { email, code, expiresAt },
+    });
 ```
 
-The existing `deleteMany` (line 49) and code creation remain unchanged after this block.
+The rest of the function (sendVerificationEmail try/catch and return) stays the same. Also remove the now-redundant `passwordHash` and `user.create` lines that were above the old code generation block (lines 39-42), since they're now inside the `if (!existing)` block.
 
-- [ ] **Step 2: Verify the route still works**
+- [ ] **Step 2: Verify the route compiles**
 
-Run: `cd "/Users/liuyi/Documents/Projects/assignment/free food events hunter" && npx tsc --noEmit src/app/api/auth/register/route.ts 2>&1 | head -10`
+Run: `cd "/Users/liuyi/Documents/Projects/assignment/free food events hunter" && npx tsc --noEmit 2>&1 | head -10`
 
 Expected: No type errors.
 
@@ -123,19 +151,21 @@ Create `src/components/Toast.tsx`:
 ```tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 
 export function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   const [visible, setVisible] = useState(true);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 300); // wait for fade-out
+      setTimeout(() => onCloseRef.current(), 300); // wait for fade-out
     }, 3000);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return createPortal(
     <div
@@ -467,19 +497,22 @@ Respond with JSON: {"results": [{"hasFreeFood": bool, "confidence": float, "food
   }
 
   // Store results in cache and fill in the results array
+  const cacheWrites: Promise<unknown>[] = [];
   for (let j = 0; j < missIndices.length; j++) {
     const idx = missIndices[j];
     results[idx] = llmResults[j] ?? neutralResult();
 
-    // Upsert to cache (fire and forget)
-    prisma.llmCache
-      .upsert({
-        where: { fingerprint: fingerprints[idx] },
-        update: { result: JSON.stringify(results[idx]), createdAt: new Date() },
-        create: { fingerprint: fingerprints[idx], result: JSON.stringify(results[idx]) },
-      })
-      .catch((err) => console.error("[llm] Cache write failed:", err));
+    cacheWrites.push(
+      prisma.llmCache
+        .upsert({
+          where: { fingerprint: fingerprints[idx] },
+          update: { result: JSON.stringify(results[idx]), createdAt: new Date() },
+          create: { fingerprint: fingerprints[idx], result: JSON.stringify(results[idx]) },
+        })
+        .catch((err) => console.error("[llm] Cache write failed:", err))
+    );
   }
+  await Promise.allSettled(cacheWrites);
 
   return results;
 }
@@ -660,14 +693,14 @@ export function SkeletonCard({ count = 3 }: { count?: number }) {
 
 In `src/app/free-food/client.tsx`:
 
-Remove the local `SkeletonCard` function (lines 9-22).
-
-Add import at the top:
+Add import at the top (after the existing imports):
 ```tsx
 import { SkeletonCard } from "@/components/SkeletonCard";
 ```
 
-Replace the loading block (lines 51-59) with:
+Remove the local `SkeletonCard` function — find the block starting with `function SkeletonCard()` and ending with its closing `}` (lines 9-22 in the original file). Delete the entire function.
+
+Then find the `if (loading)` block (search for `if (loading) {` — it renders 3 `<SkeletonCard />` components) and replace it with:
 ```tsx
   if (loading) {
     return <SkeletonCard count={3} />;
