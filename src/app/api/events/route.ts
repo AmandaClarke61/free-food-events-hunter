@@ -30,6 +30,13 @@ function dateToET(dateStr: string): Date {
   return new Date(Date.UTC(year, month, day, offsetHours, 0, 0));
 }
 
+/** Check if search term matches as a whole word (case-insensitive) in text */
+function wordMatch(text: string | null | undefined, term: string): boolean {
+  if (!text) return false;
+  const re = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+  return re.test(text);
+}
+
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
@@ -116,11 +123,7 @@ export async function GET(request: NextRequest) {
           ),
         };
       })
-      .sort((a, b) =>
-        b.score !== a.score
-          ? b.score - a.score
-          : a.event.startTime.getTime() - b.event.startTime.getTime()
-      );
+      .sort((a, b) => a.event.startTime.getTime() - b.event.startTime.getTime());
 
     // 5. In-memory pagination
     const total = scored.length;
@@ -180,6 +183,50 @@ export async function GET(request: NextRequest) {
 
   if (topic) {
     where.topics = { contains: topic };
+  }
+
+  // When search is active, use word-boundary post-filter for precision
+  if (search) {
+    const [allEvents, user] = await Promise.all([
+      prisma.event.findMany({
+        where,
+        orderBy: { startTime: "asc" },
+        include: { sources: { select: { source: true } } },
+      }),
+      getCurrentUser().catch(() => null),
+    ]);
+
+    // Post-filter: require whole-word match
+    const filtered = allEvents.filter(
+      (e) =>
+        wordMatch(e.title, search) ||
+        wordMatch(e.description, search) ||
+        wordMatch(e.location, search)
+    );
+
+    const total = filtered.length;
+    const page = filtered.slice(offset, offset + limit);
+
+    let bookmarkedIds = new Set<string>();
+    if (user && page.length > 0) {
+      const bookmarks = await prisma.bookmark.findMany({
+        where: {
+          userId: user.id,
+          eventId: { in: page.map((e) => e.id) },
+        },
+        select: { eventId: true },
+      });
+      bookmarkedIds = new Set(bookmarks.map((b) => b.eventId));
+    }
+
+    const formatted = page.map((e) => ({
+      ...e,
+      topics: JSON.parse(e.topics ?? "[]") as string[],
+      sources: e.sources.map((s) => s.source),
+      isBookmarked: bookmarkedIds.has(e.id),
+    }));
+
+    return NextResponse.json({ events: formatted, total, limit, offset });
   }
 
   const [events, total, user] = await Promise.all([

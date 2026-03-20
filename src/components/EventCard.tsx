@@ -64,6 +64,11 @@ export function EventCard({ event }: { event: EventDTO }) {
               {event.title}
             </h3>
             <div className="flex items-center gap-1 flex-shrink-0">
+              {event.score != null && event.score > 0 && (
+                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                  Recommended
+                </span>
+              )}
               {event.hasFreeFood && (
                 <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
                   Free Food
