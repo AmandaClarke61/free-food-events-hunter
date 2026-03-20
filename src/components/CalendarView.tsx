@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { EventCard } from "./EventCard";
 import type { EventDTO } from "@/lib/event";
@@ -30,6 +30,7 @@ export function CalendarView() {
   const [events, setEvents] = useState<EventDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(dateParam);
+  const eventListRef = useRef<HTMLDivElement>(null);
 
   // Navigate month when date param changes externally
   useEffect(() => {
@@ -97,7 +98,13 @@ export function CalendarView() {
   const handleDateClick = useCallback(
     (day: number) => {
       const key = toDateKey(new Date(month.getFullYear(), month.getMonth(), day));
-      setSelectedDate((prev) => (prev === key ? null : key));
+      setSelectedDate((prev) => {
+        const newVal = prev === key ? null : key;
+        if (newVal && eventListRef.current) {
+          setTimeout(() => eventListRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+        }
+        return newVal;
+      });
     },
     [month]
   );
@@ -157,7 +164,7 @@ export function CalendarView() {
               onClick={() => handleDateClick(day)}
               className={`bg-white min-h-[80px] sm:min-h-[100px] p-1.5 text-left transition hover:bg-gray-50 ${
                 isToday ? "bg-blue-50" : ""
-              } ${isSelected ? "ring-2 ring-inset ring-blue-500" : ""}`}
+              } ${isSelected ? "ring-2 ring-inset ring-blue-500 bg-blue-50" : ""}`}
             >
               <div className="flex items-center gap-1">
                 <span
@@ -170,7 +177,7 @@ export function CalendarView() {
                 {dayEvents.length > 0 && (
                   <div className="flex gap-0.5">
                     {hasFreeFoodEvent && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      <span className="h-2 w-2 rounded-full border-2 border-green-500 bg-green-100" />
                     )}
                     <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
                   </div>
@@ -200,7 +207,7 @@ export function CalendarView() {
 
       {/* Selected day events */}
       {selectedDate && (
-        <div className="mt-6">
+        <div className="mt-6" ref={eventListRef}>
           <h3 className="mb-3 text-sm font-medium text-gray-700">
             Events on{" "}
             {new Date(selectedDate + "T12:00:00").toLocaleDateString("en-US", {
