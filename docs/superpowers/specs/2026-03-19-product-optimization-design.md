@@ -26,9 +26,14 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 
 **File:** `src/app/api/auth/register/route.ts`
 
-**Problem:** No limit on verification code requests per email. Can be abused for spam or brute force.
+**Problem:** No limit on verification code requests per email. Can be abused for spam or brute force. The current code runs `deleteMany` on existing codes before creating a new one, so a naive "check for existing code" would always find nothing.
 
-**Change:** Before generating a new code, query the `VerificationCode` table for unexpired codes for that email. If one exists (created within last 5 minutes), return HTTP 429 with message "Verification code already sent. Please check your email or wait 5 minutes." No new dependencies needed.
+**Change:** The rate-limit check must be placed **before** the `deleteMany` call. Ordering:
+1. Query `VerificationCode` for this email where `createdAt > now - 5 minutes`.
+2. If found, return HTTP 429: "Verification code already sent. Please check your email or wait 5 minutes."
+3. Only then proceed with `deleteMany` + create new code + send email.
+
+No new dependencies needed.
 
 ### 1.3 Bookmark Failure Toast
 
@@ -42,6 +47,7 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 - Create a lightweight Toast component: fixed-position div at bottom-center, red background for errors, auto-dismisses after 3 seconds via `setTimeout`. Pure CSS animation (fade in/out). No third-party library.
 - In BookmarkButton's catch block, render the Toast with "Bookmark failed, please try again."
 - Toast state managed locally in BookmarkButton (simple `useState`).
+- **Important:** BookmarkButton is rendered inside an `<a>` tag in EventCard. Use `createPortal(toast, document.body)` to render the Toast at document root, avoiding invalid DOM nesting and click-propagation issues.
 
 ### 1.4 Search Input Validation + Debounce
 
@@ -51,7 +57,8 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 
 **Changes:**
 - Add `maxLength={100}` to search input.
-- Add 300ms debounce: after user stops typing for 300ms, auto-trigger search by updating URL params. Implement with `setTimeout`/`clearTimeout` in a `useEffect`, no library needed.
+- Convert search input from uncontrolled (`defaultValue`) to controlled (`value` + `useState` + `onChange`). This is required for the debounce to observe input changes.
+- Add 300ms debounce: `onChange` updates local state immediately, a `useEffect` watching the local state sets a 300ms timer to update URL params. Implement with `setTimeout`/`clearTimeout`, no library needed.
 - Keep Enter key for immediate search (clears debounce timer and fires immediately).
 
 ### 1.5 LLM Retry + Result Cache
@@ -78,9 +85,9 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
     createdAt   DateTime @default(now())
   }
   ```
-- Before calling OpenAI, check cache by fingerprint. If found and < 7 days old, use cached result.
-- After successful API call, upsert result into cache.
-- On pipeline run, bulk-query cache for all fingerprints to minimize DB round trips.
+- **Fingerprint algorithm for cache:** Hash `title + description.slice(0,300) + location` (matching exactly what gets sent to the LLM), distinct from the Event fingerprint which uses title+date. Compute inside `classifyWithLLM`.
+- **Cache layer placement:** Add cache logic inside `classifyWithLLM` itself. The function receives `EventInput[]`, computes cache fingerprints for each, does a bulk `findMany({ where: { fingerprint: { in: [...] } } })` to fetch all hits, then only sends cache-misses to OpenAI. After successful API response, bulk-upsert results into cache.
+- Cache TTL: 7 days. Stale entries cleaned up at the start of each pipeline run (`deleteMany({ where: { createdAt: { lt: 14 days ago } } })`).
 
 ---
 
@@ -93,7 +100,8 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 **Problem:** Mobile shows only colored dots, low information density. No scroll-to-detail on tap.
 
 **Changes:**
-- On date click (mobile), smooth-scroll to the event list section below the calendar grid using `scrollIntoView({ behavior: 'smooth' })`.
+- Add a `ref` (or `id`) to the event list section below the calendar grid.
+- On date click (mobile), call `ref.current.scrollIntoView({ behavior: 'smooth' })` to scroll to the event list.
 - Selected date gets a more prominent highlight: colored ring background instead of just text color change.
 - Free food days: change green dot to a slightly larger green ring for better visibility.
 
@@ -106,8 +114,9 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 **Problem:** Suspense fallback shows nothing, feels like the page is broken on slow connections.
 
 **Change:**
-- Extract the existing skeleton card markup from `src/app/free-food/client.tsx` into a shared `SkeletonCard` component.
+- Extract the existing skeleton card markup from `src/app/free-food/client.tsx` into a shared `SkeletonCard` component that accepts a `count` prop (default 3) and renders that many skeleton cards.
 - Use `<SkeletonCard count={6} />` as the Suspense fallback in both the homepage and free-food page.
+- Update `client.tsx` to use the shared component instead of inline skeleton markup.
 - Skeleton: gray animated pulse rectangles mimicking EventCard layout (title bar, date bar, description lines).
 
 ### 2.3 Dynamic Topic List
@@ -119,7 +128,7 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 **Problem:** 13 topics hard-coded. New topics from LLM classification won't appear.
 
 **Changes:**
-- New API endpoint `GET /api/topics`: queries distinct topics from all events in DB, returns sorted array.
+- New API endpoint `GET /api/topics`: The `topics` field is stored as a JSON-stringified string (e.g. `'["career","social"]'`), not a relational column. Implementation: query all non-null `topics` values, JSON-parse each, flatten into a `Set`, sort, and return as array. The 5-minute in-memory cache mitigates the cost of scanning all events.
 - Simple in-memory cache (module-level variable with timestamp), 5-minute TTL. Invalidated naturally by staleness.
 - FilterBar fetches `/api/topics` on mount, renders buttons dynamically.
 - Fallback: if fetch fails, use current hard-coded list as default.
@@ -139,7 +148,7 @@ const JWT_SECRET = process.env.NODE_ENV === 'production'
 **Problem:** Past events (visible via calendar or search) look identical to upcoming events.
 
 **Change:**
-- Compare `event.startTime` with current time.
+- Compare `event.startTime` with current time (client-side, approximate — acceptable for visual dimming, not access control).
 - If past: add gray "Ended" badge next to the date, apply `opacity-60` to the entire card.
 - Keeps past events visible but clearly distinguishable from upcoming ones.
 
