@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useEffect, useRef } from "react";
 import { ViewSwitcher } from "./ViewSwitcher";
 
-const TOPICS = [
+const DEFAULT_TOPICS = [
   "academics", "career", "social", "research", "workshop",
   "technology", "arts", "sports", "health", "networking",
   "entrepreneurship", "community", "diversity",
@@ -23,6 +23,17 @@ export function FilterBar() {
 
   const [searchInput, setSearchInput] = useState(search);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [topics, setTopics] = useState(DEFAULT_TOPICS);
+
+  useEffect(() => {
+    fetch("/api/topics")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.topics?.length > 0) setTopics(data.topics);
+      })
+      .catch(() => {}); // keep defaults on error
+  }, []);
 
   // Sync from URL -> local state when searchParams change externally
   useEffect(() => {
@@ -107,7 +118,7 @@ export function FilterBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {TOPICS.map((topic) => (
+        {topics.map((topic) => (
           <button
             key={topic}
             onClick={() =>
