@@ -33,6 +33,7 @@ export function EventCard({ event }: { event: EventDTO }) {
   const end = event.endTime ? new Date(event.endTime) : null;
 
   const dateLabel = relativeDate(start);
+  const isPast = start.getTime() < Date.now();
 
   const hasTime = start.getHours() !== 0 || start.getMinutes() !== 0;
   const endTimeStr = end && hasTime
@@ -44,7 +45,9 @@ export function EventCard({ event }: { event: EventDTO }) {
       href={event.url ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md hover:border-gray-300"
+      className={`block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md hover:border-gray-300 ${
+        isPast ? "opacity-60" : ""
+      }`}
     >
       <div className="flex gap-3">
         {event.imageUrl && (
@@ -75,6 +78,11 @@ export function EventCard({ event }: { event: EventDTO }) {
 
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
             <span>{dateLabel}{endTimeStr ? ` – ${endTimeStr}` : ""}</span>
+            {isPast && (
+              <span className="rounded bg-gray-200 px-1.5 py-0.5 text-xs font-medium text-gray-500">
+                Ended
+              </span>
+            )}
             {event.location && (
               <span className="truncate max-w-[200px]">{event.location}</span>
             )}
