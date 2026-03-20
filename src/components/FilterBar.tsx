@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { ViewSwitcher } from "./ViewSwitcher";
 
 const TOPICS = [
@@ -20,6 +20,28 @@ export function FilterBar() {
   const date = searchParams.get("date") ?? "";
 
   const hasActiveFilters = freeFood || activeTopic || search || date;
+
+  const [searchInput, setSearchInput] = useState(search);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync from URL -> local state when searchParams change externally
+  useEffect(() => {
+    setSearchInput(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  // Debounce: auto-search 300ms after typing stops
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const current = searchParams.get("search") ?? "";
+      if (searchInput !== current) {
+        updateParams({ search: searchInput || null });
+      }
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchInput]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -49,11 +71,14 @@ export function FilterBar() {
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search events... (press Enter)"
-            defaultValue={search}
+            placeholder="Search events..."
+            value={searchInput}
+            maxLength={100}
+            onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                updateParams({ search: e.currentTarget.value || null });
+                if (debounceRef.current) clearTimeout(debounceRef.current);
+                updateParams({ search: searchInput || null });
               }
             }}
             className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
