@@ -3,6 +3,7 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from "@/components/AuthProvider";
 import { UserMenu } from "@/components/UserMenu";
+import { NavLinks } from "@/components/NavLinks";
 
 export const metadata: Metadata = {
   title: "MIT Free Food Events Hunter",
@@ -24,18 +25,7 @@ export default function RootLayout({
                 MIT Events
               </Link>
               <div className="flex items-center gap-4 text-sm font-medium">
-                <Link
-                  href="/"
-                  className="text-gray-600 hover:text-gray-900 transition"
-                >
-                  All Events
-                </Link>
-                <Link
-                  href="/free-food"
-                  className="text-green-700 hover:text-green-900 transition"
-                >
-                  Free Food
-                </Link>
+                <NavLinks />
                 <UserMenu />
               </div>
             </nav>
