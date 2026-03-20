@@ -90,3 +90,10 @@ model PipelineRun {
   startedAt   DateTime @default(now())
   finishedAt  DateTime?
 }
+
+model LlmCache {
+  id          String   @id @default(cuid())
+  fingerprint String   @unique
+  result      String   // JSON stringified LLM classification result
+  createdAt   DateTime @default(now())
+}

@@ -35,6 +35,11 @@ export async function runPipeline(sourceFilter?: string) {
 
   const allRawEvents: RawEvent[] = [];
 
+  // Clean up stale LLM cache entries (older than 14 days)
+  await prisma.llmCache.deleteMany({
+    where: { createdAt: { lt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) } },
+  }).catch((err) => console.error("[pipeline] LLM cache cleanup failed:", err));
+
   for (const collector of collectors) {
     const run = await prisma.pipelineRun.create({
       data: { source: collector.name, status: "running" },
