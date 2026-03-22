@@ -2,6 +2,7 @@
 
 import type { EventDTO } from "@/lib/event";
 import { BookmarkButton } from "./BookmarkButton";
+import { AddToScheduleButton } from "./AddToScheduleButton";
 
 function relativeDate(start: Date): string {
   const now = new Date();
@@ -74,6 +75,13 @@ export function EventCard({ event }: { event: EventDTO }) {
                   Free Food
                 </span>
               )}
+              <AddToScheduleButton
+                eventId={event.id}
+                eventTitle={event.title}
+                startTime={event.startTime}
+                endTime={event.endTime}
+                location={event.location}
+              />
               <BookmarkButton
                 eventId={event.id}
                 initialBookmarked={event.isBookmarked}
