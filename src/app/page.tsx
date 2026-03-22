@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { EventsView } from "@/components/EventsView";
 import { SkeletonCard } from "@/components/SkeletonCard";
+import { AuthGate } from "@/components/AuthGate";
 
 export default function HomePage() {
   return (
@@ -13,10 +14,12 @@ export default function HomePage() {
         </p>
       </div>
 
-      <Suspense fallback={<SkeletonCard count={6} />}>
-        <FilterBar />
-        <EventsView />
-      </Suspense>
+      <AuthGate>
+        <Suspense fallback={<SkeletonCard count={6} />}>
+          <FilterBar />
+          <EventsView />
+        </Suspense>
+      </AuthGate>
     </div>
   );
 }

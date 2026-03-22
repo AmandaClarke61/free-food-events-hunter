@@ -28,6 +28,7 @@ export function NavLinks() {
           For You
         </Link>
       )}
+      {/* Calendar link hidden — premium feature not yet launched */}
     </>
   );
 }

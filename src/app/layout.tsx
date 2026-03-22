@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AuthProvider } from "@/components/AuthProvider";
 import { UserMenu } from "@/components/UserMenu";
 import { NavLinks } from "@/components/NavLinks";
+// import { ChatWidget } from "@/components/ChatWidget"; // Premium feature — hidden for now
 
 export const metadata: Metadata = {
   title: "MIT Free Food Events Hunter",
@@ -31,6 +32,7 @@ export default function RootLayout({
             </nav>
           </header>
           <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
+          {/* <ChatWidget /> Premium feature — hidden for now */}
         </AuthProvider>
       </body>
     </html>

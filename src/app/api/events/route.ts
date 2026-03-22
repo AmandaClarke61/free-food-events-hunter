@@ -38,6 +38,8 @@ function wordMatch(text: string | null | undefined, term: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
+  const currentUser = await getCurrentUser().catch(() => null);
+
   const params = request.nextUrl.searchParams;
 
   const freeFood = params.get("freeFood") === "true" ? true : undefined;
@@ -52,10 +54,10 @@ export async function GET(request: NextRequest) {
 
   // --- forYou branch: score all upcoming events and return sorted ---
   if (forYou) {
-    const user = await getCurrentUser();
-    if (!user) {
+    if (!currentUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const user = currentUser;
 
     // 1. Fetch user interests
     const dbUser = await prisma.user.findUnique({
@@ -187,14 +189,12 @@ export async function GET(request: NextRequest) {
 
   // When search is active, use word-boundary post-filter for precision
   if (search) {
-    const [allEvents, user] = await Promise.all([
-      prisma.event.findMany({
-        where,
-        orderBy: { startTime: "asc" },
-        include: { sources: { select: { source: true } } },
-      }),
-      getCurrentUser().catch(() => null),
-    ]);
+    const user = currentUser;
+    const allEvents = await prisma.event.findMany({
+      where,
+      orderBy: { startTime: "asc" },
+      include: { sources: { select: { source: true } } },
+    });
 
     // Post-filter: require whole-word match
     const filtered = allEvents.filter(
@@ -229,7 +229,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ events: formatted, total, limit, offset });
   }
 
-  const [events, total, user] = await Promise.all([
+  const user = currentUser;
+  const [events, total] = await Promise.all([
     prisma.event.findMany({
       where,
       orderBy: { startTime: "asc" },
@@ -238,7 +239,6 @@ export async function GET(request: NextRequest) {
       include: { sources: { select: { source: true } } },
     }),
     prisma.event.count({ where }),
-    getCurrentUser().catch(() => null),
   ]);
 
   // If user is logged in, attach bookmark status

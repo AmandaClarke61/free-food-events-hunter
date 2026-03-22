@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { FreeFoodEventFeedClient } from "./client";
 import { SkeletonCard } from "@/components/SkeletonCard";
+import { AuthGate } from "@/components/AuthGate";
 
 export default function FreeFoodPage() {
   return (
@@ -12,9 +13,11 @@ export default function FreeFoodPage() {
         </p>
       </div>
 
-      <Suspense fallback={<SkeletonCard count={6} />}>
-        <FreeFoodEventFeedClient />
-      </Suspense>
+      <AuthGate>
+        <Suspense fallback={<SkeletonCard count={6} />}>
+          <FreeFoodEventFeedClient />
+        </Suspense>
+      </AuthGate>
     </div>
   );
 }

@@ -13,6 +13,7 @@ interface User {
   id: string;
   email: string;
   name?: string | null;
+  plan?: "free" | "pro";
 }
 
 interface AuthContextValue {
