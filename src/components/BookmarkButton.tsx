@@ -57,7 +57,7 @@ export function BookmarkButton({
         onClick={toggle}
         disabled={loading}
         title={bookmarked ? "Remove bookmark" : "Bookmark this event"}
-        className="flex-shrink-0 p-1 rounded-full hover:bg-gray-100 transition disabled:opacity-50"
+        className="flex-shrink-0 p-1.5 rounded-full hover:bg-pink-light transition-all duration-300 disabled:opacity-50"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@ export function BookmarkButton({
           fill={bookmarked ? "currentColor" : "none"}
           stroke="currentColor"
           strokeWidth={bookmarked ? 0 : 1.5}
-          className={`h-5 w-5 ${bookmarked ? "text-red-500" : "text-gray-400"}`}
+          className={`h-5 w-5 transition-all duration-300 ${bookmarked ? "text-pink scale-110" : "text-cute-muted"}`}
         >
           <path
             strokeLinecap="round"

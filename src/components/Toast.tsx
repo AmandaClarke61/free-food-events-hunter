@@ -18,7 +18,7 @@ export function Toast({ message, onClose }: { message: string; onClose: () => vo
 
   return createPortal(
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-red-600 px-4 py-2.5 text-sm text-white shadow-lg transition-opacity duration-300 ${
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-2xl bg-cute-text px-5 py-3 text-sm font-bold text-white shadow-lg transition-opacity duration-300 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >

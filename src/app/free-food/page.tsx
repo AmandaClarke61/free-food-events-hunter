@@ -7,8 +7,10 @@ export default function FreeFoodPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-green-800">Free Food Events</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-3xl font-bold text-mint">
+          &#127829; Free Food Events
+        </h1>
+        <p className="mt-1 text-sm text-cute-light font-semibold">
           Upcoming MIT events with free food, automatically detected
         </p>
       </div>

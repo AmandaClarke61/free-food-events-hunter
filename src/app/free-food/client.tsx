@@ -40,16 +40,17 @@ export function FreeFoodEventFeedClient() {
 
   if (events.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-500">
-        <p className="text-lg font-medium">No free food events right now</p>
-        <p className="mt-1 text-sm">Check back soon — events are updated every 6 hours.</p>
+      <div className="py-12 text-center text-cute-light">
+        <div className="text-4xl mb-3">&#127829;</div>
+        <p className="text-lg font-bold">No free food events right now</p>
+        <p className="mt-1 text-sm">Check back soon — events update every 6 hours!</p>
       </div>
     );
   }
 
   return (
     <div>
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-cute-light font-semibold">
         {total} free food event{total !== 1 ? "s" : ""} coming up
       </p>
       <div className="space-y-3">
@@ -62,9 +63,9 @@ export function FreeFoodEventFeedClient() {
           <button
             onClick={loadMore}
             disabled={loadingMore}
-            className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50"
+            className="btn-secondary disabled:opacity-50"
           >
-            {loadingMore ? "Loading..." : `Load more (showing ${events.length} of ${total})`}
+            {loadingMore ? "Loading..." : `Load more (${events.length}/${total})`}
           </button>
         </div>
       )}

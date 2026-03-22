@@ -9,13 +9,13 @@ const PAGE_SIZE = 20;
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-lg border border-gray-200 bg-white p-4">
+    <div className="animate-pulse card p-4">
       <div className="flex gap-3">
-        <div className="h-20 w-20 rounded-md bg-gray-200 flex-shrink-0" />
+        <div className="h-20 w-20 rounded-2xl bg-cream-dark flex-shrink-0" />
         <div className="min-w-0 flex-1 space-y-3">
-          <div className="h-4 w-3/4 rounded bg-gray-200" />
-          <div className="h-3 w-1/2 rounded bg-gray-200" />
-          <div className="h-3 w-full rounded bg-gray-200" />
+          <div className="h-4 w-3/4 rounded-full bg-cream-dark" />
+          <div className="h-3 w-1/2 rounded-full bg-cream-dark" />
+          <div className="h-3 w-full rounded-full bg-cream-dark" />
         </div>
       </div>
     </div>
@@ -104,7 +104,7 @@ export function EventFeed() {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <div className="rounded-2xl bg-pink-light p-4 text-sm text-pink-dark font-semibold border-2 border-pink/20">
         Failed to load events: {error}
       </div>
     );
@@ -112,8 +112,9 @@ export function EventFeed() {
 
   if (events.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-500">
-        <p className="text-lg font-medium">No events found</p>
+      <div className="py-12 text-center text-cute-light">
+        <div className="text-4xl mb-3">&#128533;</div>
+        <p className="text-lg font-bold">No events found</p>
         <p className="mt-1 text-sm">Try adjusting your filters or check back later.</p>
       </div>
     );
@@ -122,7 +123,7 @@ export function EventFeed() {
   return (
     <div>
       <div ref={topRef} />
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-cute-light font-semibold">
         {total} event{total !== 1 ? "s" : ""} found
       </p>
       <div className="space-y-3">
@@ -135,9 +136,9 @@ export function EventFeed() {
           <button
             onClick={loadMore}
             disabled={loadingMore}
-            className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50"
+            className="btn-secondary disabled:opacity-50"
           >
-            {loadingMore ? "Loading..." : `Load more (showing ${events.length} of ${total})`}
+            {loadingMore ? "Loading..." : `Load more (${events.length}/${total})`}
           </button>
         </div>
       )}

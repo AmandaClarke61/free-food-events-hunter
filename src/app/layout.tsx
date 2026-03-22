@@ -4,7 +4,6 @@ import Link from "next/link";
 import { AuthProvider } from "@/components/AuthProvider";
 import { UserMenu } from "@/components/UserMenu";
 import { NavLinks } from "@/components/NavLinks";
-// import { ChatWidget } from "@/components/ChatWidget"; // Premium feature — hidden for now
 
 export const metadata: Metadata = {
   title: "MIT Free Food Events Hunter",
@@ -18,21 +17,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 text-gray-900 antialiased">
+      <body>
         <AuthProvider>
-          <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+          <header className="sticky top-0 z-10 bg-cream/80 backdrop-blur-md border-b-2 border-cute-border">
             <nav className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-              <Link href="/" className="text-lg font-bold text-gray-900">
-                MIT Events
+              <Link href="/" className="flex items-center gap-2 group">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-pink to-purple text-white text-sm font-bold shadow-md transition-transform group-hover:scale-110 group-hover:rotate-3">
+                  M
+                </span>
+                <span className="text-lg font-bold text-cute-text tracking-tight">
+                  MIT Events
+                </span>
               </Link>
-              <div className="flex items-center gap-4 text-sm font-medium">
+              <div className="flex items-center gap-5 text-sm font-semibold">
                 <NavLinks />
                 <UserMenu />
               </div>
             </nav>
           </header>
-          <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
-          {/* <ChatWidget /> Premium feature — hidden for now */}
+          <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
         </AuthProvider>
       </body>
     </html>

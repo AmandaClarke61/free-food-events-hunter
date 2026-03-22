@@ -25,7 +25,7 @@ export function UserMenu() {
     return (
       <Link
         href="/login"
-        className="text-sm font-medium text-gray-600 hover:text-gray-900 transition"
+        className="text-sm font-bold text-cute-light hover:text-pink transition-colors"
       >
         Sign in
       </Link>
@@ -38,32 +38,32 @@ export function UserMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 transition"
+        className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-pink to-purple text-sm font-bold text-white shadow-md hover:scale-110 hover:rotate-3 transition-all duration-300"
       >
         {initial}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg z-50">
-          <div className="border-b border-gray-100 px-4 py-2">
-            <p className="text-sm font-medium text-gray-900 truncate">
+        <div className="absolute right-0 mt-2 w-52 card py-2 z-50 animate-slide-down">
+          <div className="border-b-2 border-cute-border px-4 py-3">
+            <p className="text-sm font-bold text-cute-text truncate">
               {user.email}
             </p>
           </div>
           <Link
             href="/bookmarks"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block px-4 py-2.5 text-sm font-semibold text-cute-light hover:bg-pink-light hover:text-pink rounded-lg mx-1 transition-all"
           >
-            My Bookmarks
+            &#10084;&#65039; My Bookmarks
           </Link>
           <button
             onClick={() => {
               setOpen(false);
               logout();
             }}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block w-full text-left px-4 py-2.5 text-sm font-semibold text-cute-light hover:bg-cream-dark rounded-lg mx-1 transition-all"
           >
-            Sign out
+            &#128075; Sign out
           </button>
         </div>
       )}

@@ -10,7 +10,6 @@ function relativeDate(start: Date): string {
   const eventDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
   const diffDays = Math.round((eventDay.getTime() - today.getTime()) / 86400000);
 
-  // If time is exactly midnight, the source likely didn't provide a time — omit it
   const hasTime = start.getHours() !== 0 || start.getMinutes() !== 0;
   const timeStr = hasTime
     ? start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
@@ -46,9 +45,7 @@ export function EventCard({ event }: { event: EventDTO }) {
       href={event.url ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className={`block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md hover:border-gray-300 ${
-        isPast ? "opacity-60" : ""
-      }`}
+      className={`card block p-4 ${isPast ? "opacity-50" : ""}`}
     >
       <div className="flex gap-3">
         {event.imageUrl && (
@@ -56,23 +53,23 @@ export function EventCard({ event }: { event: EventDTO }) {
             src={event.imageUrl}
             alt=""
             loading="lazy"
-            className="h-20 w-20 rounded-md object-cover flex-shrink-0"
+            className="h-20 w-20 rounded-2xl object-cover flex-shrink-0"
           />
         )}
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-gray-900 leading-tight line-clamp-2">
+            <h3 className="font-bold text-cute-text leading-tight line-clamp-2">
               {event.title}
             </h3>
             <div className="flex items-center gap-1 flex-shrink-0">
               {event.score != null && event.score > 0 && (
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                  Recommended
+                <span className="badge bg-purple-light text-purple">
+                  &#11088; Recommended
                 </span>
               )}
               {event.hasFreeFood && (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Free Food
+                <span className="badge bg-mint-light text-mint">
+                  &#127829; Free Food
                 </span>
               )}
               <AddToScheduleButton
@@ -89,10 +86,10 @@ export function EventCard({ event }: { event: EventDTO }) {
             </div>
           </div>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-cute-light">
             <span>{dateLabel}{endTimeStr ? ` – ${endTimeStr}` : ""}</span>
             {isPast && (
-              <span className="rounded bg-gray-200 px-1.5 py-0.5 text-xs font-medium text-gray-500">
+              <span className="badge bg-cream-dark text-cute-muted text-xs">
                 Ended
               </span>
             )}
@@ -102,11 +99,11 @@ export function EventCard({ event }: { event: EventDTO }) {
           </div>
 
           {event.foodDetails && (
-            <p className="mt-1.5 text-sm text-green-700">{event.foodDetails}</p>
+            <p className="mt-1.5 text-sm text-mint font-semibold">{event.foodDetails}</p>
           )}
 
           {event.description && (
-            <p className="mt-1.5 text-sm text-gray-600 line-clamp-2">
+            <p className="mt-1.5 text-sm text-cute-light line-clamp-2">
               {event.description}
             </p>
           )}
@@ -115,7 +112,7 @@ export function EventCard({ event }: { event: EventDTO }) {
             {event.topics.map((topic) => (
               <span
                 key={topic}
-                className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                className="rounded-full bg-cream-dark px-2.5 py-0.5 text-xs font-semibold text-cute-light"
               >
                 {topic}
               </span>
@@ -123,7 +120,7 @@ export function EventCard({ event }: { event: EventDTO }) {
             {event.sources.map((src) => (
               <span
                 key={src}
-                className="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
+                className="rounded-full bg-purple-light px-2.5 py-0.5 text-xs font-semibold text-purple"
               >
                 {src}
               </span>

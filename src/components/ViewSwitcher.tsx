@@ -22,13 +22,13 @@ export function ViewSwitcher() {
   );
 
   return (
-    <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+    <div className="flex rounded-2xl border-2 border-cute-border overflow-hidden bg-cute-card">
       <button
         onClick={() => setView("list")}
-        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition ${
+        className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-bold transition-all duration-300 ${
           view !== "calendar"
-            ? "bg-blue-600 text-white"
-            : "bg-white text-gray-700 hover:bg-gray-50"
+            ? "bg-gradient-to-r from-pink to-purple text-white"
+            : "text-cute-light hover:bg-cream-dark hover:text-cute-text"
         }`}
         aria-label="List view"
       >
@@ -41,10 +41,10 @@ export function ViewSwitcher() {
       </button>
       <button
         onClick={() => setView("calendar")}
-        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition border-l border-gray-300 ${
+        className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-bold transition-all duration-300 border-l-2 border-cute-border ${
           view === "calendar"
-            ? "bg-blue-600 text-white"
-            : "bg-white text-gray-700 hover:bg-gray-50"
+            ? "bg-gradient-to-r from-pink to-purple text-white"
+            : "text-cute-light hover:bg-cream-dark hover:text-cute-text"
         }`}
         aria-label="Calendar view"
       >

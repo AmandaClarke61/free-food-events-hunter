@@ -28,21 +28,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm pt-12">
-      <h1 className="text-2xl font-bold text-gray-900 text-center">Sign in</h1>
-      <p className="mt-2 text-sm text-gray-500 text-center">
-        Use your @mit.edu email
-      </p>
+    <div className="mx-auto max-w-sm pt-6">
+      <div className="text-center">
+        <div className="text-4xl mb-3">&#128075;</div>
+        <h1 className="text-3xl font-bold text-cute-text">Welcome back!</h1>
+        <p className="mt-2 text-sm text-cute-light font-semibold">
+          Sign in with your @mit.edu email
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         {error && (
-          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-2xl bg-pink-light px-4 py-3 text-sm text-pink-dark font-semibold border-2 border-pink/20">
             {error}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-bold text-cute-text mb-1.5">
             Email
           </label>
           <input
@@ -51,12 +54,12 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="kerb@mit.edu"
             required
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+            className="input-field"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-bold text-cute-text mb-1.5">
             Password
           </label>
           <input
@@ -64,22 +67,22 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+            className="input-field"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition"
+          className="btn-primary w-full disabled:opacity-50"
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Signing in..." : "Sign in &#10024;"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-8 text-center text-sm text-cute-light font-semibold">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="font-medium text-gray-900 hover:underline">
+        <Link href="/register" className="font-bold text-pink hover:text-pink-dark transition-colors">
           Register
         </Link>
       </p>

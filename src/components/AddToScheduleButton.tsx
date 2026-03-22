@@ -59,8 +59,8 @@ export function AddToScheduleButton({ eventId, eventTitle, startTime, endTime, l
         disabled={saving || added}
         className={`rounded p-1 transition ${
           added
-            ? "text-purple-600"
-            : "text-gray-400 hover:text-purple-600 hover:bg-purple-50"
+            ? "text-purple"
+            : "text-cute-muted hover:text-purple hover:bg-purple-light"
         }`}
         title={added ? "Added to calendar" : "Add to calendar"}
       >

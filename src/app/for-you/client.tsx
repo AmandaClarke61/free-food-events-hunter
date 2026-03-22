@@ -21,7 +21,6 @@ export function ForYouClient() {
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
 
-  // Fetch user interests + available topics on mount
   useEffect(() => {
     if (authLoading || !user) {
       setLoading(false);
@@ -97,20 +96,17 @@ export function ForYouClient() {
     );
   };
 
-  // --- State 1: Not logged in ---
   if (!authLoading && !user) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-        <h2 className="text-lg font-semibold text-gray-900">
+      <div className="card p-8 text-center">
+        <div className="text-4xl mb-3">&#11088;</div>
+        <h2 className="text-xl font-bold text-cute-text">
           Get personalized recommendations
         </h2>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-cute-light font-semibold">
           Log in to see events tailored to your interests.
         </p>
-        <Link
-          href="/login"
-          className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition"
-        >
+        <Link href="/login" className="btn-primary mt-4 inline-block">
           Log in
         </Link>
       </div>
@@ -121,14 +117,13 @@ export function ForYouClient() {
     return <SkeletonCard count={3} />;
   }
 
-  // --- State 2: No interests set / Editing ---
   if (interests.length === 0 || editing) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {editing ? "Edit your interests" : "Pick topics you're interested in"}
+      <div className="card p-6">
+        <h2 className="text-xl font-bold text-cute-text">
+          {editing ? "Edit your interests" : "Pick topics you like! &#127912;"}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-cute-light font-semibold">
           Select up to 10 topics to personalize your recommendations.
         </p>
 
@@ -137,10 +132,10 @@ export function ForYouClient() {
             <button
               key={topic}
               onClick={() => toggleTopic(topic)}
-              className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
+              className={`rounded-full px-3.5 py-1.5 text-sm font-bold transition-all duration-300 ${
                 selectedTopics.includes(topic)
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-pink to-purple text-white shadow-sm"
+                  : "bg-cream-dark text-cute-light hover:bg-purple-light hover:text-purple"
               }`}
             >
               {topic}
@@ -152,9 +147,9 @@ export function ForYouClient() {
           <button
             onClick={saveInterests}
             disabled={selectedTopics.length === 0 || saving}
-            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
+            className="btn-primary disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Done"}
+            {saving ? "Saving..." : "Done &#10024;"}
           </button>
           {editing && (
             <button
@@ -162,13 +157,13 @@ export function ForYouClient() {
                 setSelectedTopics(interests);
                 setEditing(false);
               }}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-cute-muted hover:text-cute-text font-bold transition-colors"
             >
               Cancel
             </button>
           )}
           {selectedTopics.length > 0 && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-cute-muted font-bold">
               {selectedTopics.length}/10 selected
             </span>
           )}
@@ -177,15 +172,13 @@ export function ForYouClient() {
     );
   }
 
-  // --- State 3: Has interests, show recommendations ---
   return (
     <div>
-      {/* Interest tags bar */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {interests.map((topic) => (
           <span
             key={topic}
-            className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+            className="badge bg-purple-light text-purple"
           >
             {topic}
           </span>
@@ -195,22 +188,21 @@ export function ForYouClient() {
             setSelectedTopics(interests);
             setEditing(true);
           }}
-          className="text-xs text-blue-600 hover:text-blue-800 underline"
+          className="text-xs text-pink hover:text-pink-dark font-bold"
         >
           Edit
         </button>
       </div>
 
       {events.length === 0 ? (
-        <div className="py-12 text-center text-gray-500">
-          <p className="text-lg font-medium">
-            No recommended events right now
-          </p>
+        <div className="py-12 text-center text-cute-light">
+          <div className="text-4xl mb-3">&#128533;</div>
+          <p className="text-lg font-bold">No recommended events right now</p>
           <p className="mt-1 text-sm">Check back soon!</p>
         </div>
       ) : (
         <>
-          <p className="mb-4 text-sm text-gray-500">
+          <p className="mb-4 text-sm text-cute-light font-semibold">
             {total} recommended event{total !== 1 ? "s" : ""}
           </p>
           <div className="space-y-3">
@@ -223,11 +215,9 @@ export function ForYouClient() {
               <button
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50"
+                className="btn-secondary disabled:opacity-50"
               >
-                {loadingMore
-                  ? "Loading..."
-                  : `Load more (showing ${events.length} of ${total})`}
+                {loadingMore ? "Loading..." : `Load more (${events.length}/${total})`}
               </button>
             </div>
           )}
