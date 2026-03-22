@@ -1,21 +1,24 @@
 import Stripe from "stripe";
 import { prisma } from "./db";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_not_configured");
+  }
+  return _stripe;
+}
 
 export const PRICE_ID = process.env.STRIPE_PRICE_ID || "";
 
 export async function getOrCreateCustomer(userId: string, email: string) {
-  // Check if user already has a subscription with a payment ID (Stripe customer)
   const sub = await prisma.subscription.findUnique({ where: { userId } });
   if (sub?.paymentId) {
-    // paymentId stores "cus_xxx|sub_xxx"
     const cusId = sub.paymentId.split("|")[0];
     if (cusId.startsWith("cus_")) return cusId;
   }
 
-  // Create new Stripe customer
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email,
     metadata: { userId },
   });
@@ -26,7 +29,7 @@ export async function getOrCreateCustomer(userId: string, email: string) {
 export async function createCheckoutSession(userId: string, email: string) {
   const customerId = await getOrCreateCustomer(userId, email);
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     line_items: [{ price: PRICE_ID, quantity: 1 }],
@@ -48,7 +51,7 @@ export async function createPortalSession(userId: string) {
 
   const customerId = sub.paymentId.split("|")[0];
 
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/pricing`,
   });
@@ -120,6 +123,11 @@ export async function handleSubscriptionEvent(event: Stripe.Event) {
       break;
     }
   }
+}
+
+// Expose for webhook route
+export function constructWebhookEvent(body: string, sig: string, secret: string) {
+  return getStripe().webhooks.constructEvent(body, sig, secret);
 }
 
 export async function isProUser(userId: string): Promise<boolean> {

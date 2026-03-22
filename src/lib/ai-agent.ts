@@ -1,7 +1,9 @@
 import OpenAI from "openai";
 import { prisma } from "./db";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "not-configured" });
+}
 
 const TOOLS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
@@ -109,7 +111,7 @@ export async function processMessage(
 
   // Loop for tool calls (max 5 iterations)
   for (let i = 0; i < 5; i++) {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages,
       tools: TOOLS,
