@@ -121,7 +121,7 @@ export function ForYouClient() {
     return (
       <div className="card p-6">
         <h2 className="text-xl font-bold text-cute-text">
-          {editing ? "Edit your interests" : "Pick topics you like! &#127912;"}
+          {editing ? "Edit your interests" : "Pick topics you like! 🎨"}
         </h2>
         <p className="mt-1 text-sm text-cute-light font-semibold">
           Select up to 10 topics to personalize your recommendations.
@@ -149,7 +149,7 @@ export function ForYouClient() {
             disabled={selectedTopics.length === 0 || saving}
             className="btn-primary disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Done &#10024;"}
+            {saving ? "Saving..." : "Done ✨"}
           </button>
           {editing && (
             <button

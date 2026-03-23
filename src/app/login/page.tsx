@@ -76,7 +76,7 @@ export default function LoginPage() {
           disabled={loading}
           className="btn-primary w-full disabled:opacity-50"
         >
-          {loading ? "Signing in..." : "Sign in &#10024;"}
+          {loading ? "Signing in..." : "Sign in ✨"}
         </button>
       </form>
 
