@@ -8,6 +8,8 @@ export function NavLinks() {
   const { user } = useAuth();
   const pathname = usePathname();
 
+  if (!user) return null;
+
   const linkClass = (href: string, color: string, activeColor: string) =>
     `relative rounded-full px-3.5 py-1.5 transition-all duration-300 ${
       pathname === href
@@ -23,11 +25,9 @@ export function NavLinks() {
       <Link href="/free-food" className={linkClass("/free-food", "text-mint", "bg-mint-light text-mint")}>
         Free Food
       </Link>
-      {user && (
-        <Link href="/for-you" className={linkClass("/for-you", "text-pink", "bg-pink-light text-pink")}>
-          For You
-        </Link>
-      )}
+      <Link href="/for-you" className={linkClass("/for-you", "text-pink", "bg-pink-light text-pink")}>
+        For You
+      </Link>
     </>
   );
 }
