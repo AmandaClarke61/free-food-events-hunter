@@ -2,7 +2,10 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { prisma } from "@/lib/db";
 
-const openai = new OpenAI();
+const openai = new OpenAI({
+  apiKey: process.env.GEMINI_API_KEY || "not-configured",
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+});
 
 interface LLMClassification {
   hasFreeFood: boolean;
@@ -58,7 +61,7 @@ export async function classifyWithLLM(
     topics: [],
   });
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return events.map(() => neutralResult());
   }
 
@@ -100,7 +103,7 @@ export async function classifyWithLLM(
   try {
     const response = await retryWithBackoff(() =>
       openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "models/gemini-2.0-flash",
         temperature: 0,
         response_format: { type: "json_object" },
         messages: [

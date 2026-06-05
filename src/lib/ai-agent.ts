@@ -2,7 +2,10 @@ import OpenAI from "openai";
 import { prisma } from "./db";
 
 function getOpenAI() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "not-configured" });
+  return new OpenAI({
+    apiKey: process.env.GEMINI_API_KEY || "not-configured",
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  });
 }
 
 const TOOLS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -104,6 +107,7 @@ export async function processMessage(
     { role: "user", content: userMessage },
   ];
 
+  // Only keep simple user/assistant text pairs in history to avoid tool call format issues
   const newHistory: ConversationMessage[] = [
     ...conversationHistory,
     { role: "user", content: userMessage },
@@ -112,7 +116,7 @@ export async function processMessage(
   // Loop for tool calls (max 5 iterations)
   for (let i = 0; i < 5; i++) {
     const response = await getOpenAI().chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "models/gemini-2.5-flash",
       messages,
       tools: TOOLS,
       temperature: 0.3,
@@ -122,12 +126,8 @@ export async function processMessage(
     const msg = choice.message;
 
     if (msg.tool_calls && msg.tool_calls.length > 0) {
-      // Add assistant message with tool calls
+      // Add full assistant message with tool calls to messages (for this request only)
       messages.push(msg);
-      newHistory.push({
-        role: "assistant",
-        content: msg.content || "",
-      });
 
       // Execute each tool call
       for (const toolCall of msg.tool_calls) {
@@ -142,12 +142,6 @@ export async function processMessage(
           content: JSON.stringify(result),
         };
         messages.push(toolMsg);
-        newHistory.push({
-          role: "tool",
-          content: JSON.stringify(result),
-          tool_call_id: toolCall.id,
-          name: tc.function.name,
-        });
       }
       continue;
     }
