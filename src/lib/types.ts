@@ -1,5 +1,25 @@
+export type School = "mit" | "harvard";
+
+/** Source identifier — namespaced by school so cross-school dedup is safe. */
+export type EventSourceName =
+  // MIT
+  | "localist"
+  | "campusgroups"
+  | "sloangroups"
+  | "gsc"
+  | "csail"
+  | "idss"
+  | "medialab"
+  | "mitsloan"
+  | "bcs"
+  // Harvard (Localist instances)
+  | "harvard-college"
+  | "harvard-hbs"
+  | "harvard-seas";
+
 /** Unified event shape coming out of any collector */
 export interface RawEvent {
+  school: School;
   title: string;
   description?: string;
   startTime: Date;
@@ -7,7 +27,7 @@ export interface RawEvent {
   location?: string;
   url?: string;
   imageUrl?: string;
-  source: "localist" | "campusgroups" | "sloangroups" | "gsc" | "csail" | "idss" | "medialab" | "mitsloan" | "bcs";
+  source: EventSourceName;
   sourceId?: string;
   rawData?: Record<string, unknown>;
   /** Structured hints from the source (e.g. Localist "free" flag) */

@@ -52,6 +52,7 @@ export async function collectBCS(): Promise<RawEvent[]> {
       endTime: endTime ?? undefined,
       location,
       url,
+      school: "mit",
       source: "bcs",
       sourceId: relUrl ?? undefined,
     });

@@ -97,6 +97,7 @@ async function collectFromSite(site: CGSiteConfig): Promise<RawEvent[]> {
           ? imageUrl
           : `${site.siteOrigin}${imageUrl}`
         : undefined,
+      school: "mit",
       source: site.sourceName,
       sourceId: eventId ?? undefined,
     });

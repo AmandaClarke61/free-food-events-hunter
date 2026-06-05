@@ -23,7 +23,7 @@ export async function normalizeAndClassify(
         : ruleResult.confidence,
       foodDetails: ruleResult.foodDetails,
       topics,
-      fingerprint: makeFingerprint(event.title, event.startTime),
+      fingerprint: makeFingerprint(event.school, event.title, event.startTime),
     };
 
     classified.push(ce);

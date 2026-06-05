@@ -64,6 +64,7 @@ export async function collectMediaLab(): Promise<RawEvent[]> {
       endTime: endTime ?? undefined,
       url,
       imageUrl,
+      school: "mit",
       source: "medialab",
       sourceId: relUrl ?? undefined,
     });

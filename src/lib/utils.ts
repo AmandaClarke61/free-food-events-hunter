@@ -1,15 +1,33 @@
 import crypto from "crypto";
 
-/** Create a dedup fingerprint from title + start date */
-export function makeFingerprint(title: string, startTime: Date): string {
+/** Create a dedup fingerprint scoped by school + title + start date.
+ *  School namespacing keeps MIT and Harvard events distinct even when titles collide. */
+export function makeFingerprint(
+  schoolOrTitle: string,
+  titleOrStart: string | Date,
+  startTime?: Date
+): string {
+  let school: string;
+  let title: string;
+  let start: Date;
+  if (titleOrStart instanceof Date) {
+    // Legacy 2-arg call: (title, startTime) → default school "mit"
+    school = "mit";
+    title = schoolOrTitle;
+    start = titleOrStart;
+  } else {
+    school = schoolOrTitle;
+    title = titleOrStart;
+    start = startTime as Date;
+  }
   const normalized = title
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "")
     .slice(0, 80);
-  const dateStr = startTime.toISOString().slice(0, 10); // YYYY-MM-DD
+  const dateStr = start.toISOString().slice(0, 10);
   return crypto
     .createHash("sha256")
-    .update(`${normalized}|${dateStr}`)
+    .update(`${school}|${normalized}|${dateStr}`)
     .digest("hex")
     .slice(0, 16);
 }

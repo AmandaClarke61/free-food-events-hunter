@@ -10,6 +10,7 @@ datasource db {
 
 model Event {
   id          String   @id @default(cuid())
+  school      String   @default("mit") // "mit" | "harvard" — multi-tenant scope
   title       String
   description String?
   startTime   DateTime
@@ -24,7 +25,7 @@ model Event {
 
   topics String? // JSON array of topic strings
 
-  fingerprint String  @unique // For dedup: hash of title+date
+  fingerprint String  @unique // For dedup: hash of school+title+date
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -33,7 +34,8 @@ model Event {
   schedules Schedule[]
 
   @@index([startTime])
-  @@index([hasFreeFood, startTime])
+  @@index([school, startTime])
+  @@index([school, hasFreeFood, startTime])
 }
 
 model EventSource {
@@ -53,6 +55,7 @@ model User {
   email        String     @unique
   passwordHash String
   name         String?
+  school       String     @default("mit") // user's primary school: "mit" | "harvard"
   interests    String?    // JSON array of topic strings
   verified     Boolean    @default(false)
   createdAt    DateTime   @default(now())

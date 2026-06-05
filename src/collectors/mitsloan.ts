@@ -80,6 +80,7 @@ export async function collectMITSloan(): Promise<RawEvent[]> {
         startTime,
         endTime,
         url: eventUrl,
+        school: "mit",
         source: "mitsloan",
         sourceId: eventUrl ?? `sloan-${title.slice(0, 30)}`,
       });

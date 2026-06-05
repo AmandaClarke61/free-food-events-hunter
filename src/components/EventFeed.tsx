@@ -39,10 +39,12 @@ export function EventFeed() {
     const topic = searchParams.get("topic");
     const search = searchParams.get("search");
     const date = searchParams.get("date");
+    const school = searchParams.get("school");
 
     if (freeFood) params.set("freeFood", freeFood);
     if (topic) params.set("topic", topic);
     if (search) params.set("search", search);
+    if (school) params.set("school", school);
     if (date) {
       params.set("dateFrom", date);
       const next = new Date(date);

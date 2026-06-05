@@ -105,9 +105,12 @@ export function detectFreeFoodByRules(
     return { hasFreeFood: true, confidence: 0.70, foodDetails, isAmbiguous: false };
   }
 
-  // Medium-confidence signals: in a campus context these almost always mean free food
-  const mediumSignals =
-    /\b(reception|mixer|happy\s*hour|potluck|cookout|brunch)\b/i;
+  // Medium-confidence signals: in a campus context these almost always mean free food.
+  // NOTE: bare "reception" is intentionally NOT here — it is ambiguous ("opening
+  // reception, refreshments served" vs. "the reception of Celtic art"), so it is
+  // routed to the LLM via weakSignals below. The precise "reception with / to follow"
+  // form is already caught by FREE_FOOD_PATTERNS at higher confidence.
+  const mediumSignals = /\b(mixer|happy\s*hour|potluck|cookout|brunch)\b/i;
   const mediumInTitle = mediumSignals.test(title);
   const mediumInDesc = description ? mediumSignals.test(description) : false;
 
@@ -118,9 +121,9 @@ export function detectFreeFoodByRules(
     return { hasFreeFood: true, confidence: 0.65, foodDetails, isAmbiguous: false };
   }
 
-  // Weak signals — only mark as ambiguous for LLM if available
+  // Weak / ambiguous signals — defer to the LLM, which can read context
   const weakSignals =
-    /\b(social|networking\s*event|open\s*house|celebration|ceremony)\b/i.test(text);
+    /\b(reception|social|networking\s*event|open\s*house|celebration|ceremony)\b/i.test(text);
 
   if (weakSignals) {
     return { hasFreeFood: false, confidence: 0.3, isAmbiguous: true };

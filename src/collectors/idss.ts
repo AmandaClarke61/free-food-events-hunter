@@ -39,6 +39,7 @@ export async function collectIDSS(): Promise<RawEvent[]> {
       endTime: endTime ?? undefined,
       location: location || undefined,
       url: url || undefined,
+      school: "mit",
       source: "idss",
       sourceId: uid ?? undefined,
     });

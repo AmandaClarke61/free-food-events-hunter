@@ -58,6 +58,7 @@ export async function collectCSAIL(): Promise<RawEvent[]> {
       endTime,
       location,
       url,
+      school: "mit",
       source: "csail",
       sourceId: relUrl ?? undefined,
     });

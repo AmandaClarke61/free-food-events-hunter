@@ -75,6 +75,7 @@ export async function collectGSC(): Promise<RawEvent[]> {
       endTime: end ?? undefined,
       location,
       url: eventUrl,
+      school: "mit",
       source: "gsc",
       sourceId: `anno-${id}`,
       freeFoodHint: isFreeFood,

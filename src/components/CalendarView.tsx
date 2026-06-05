@@ -47,6 +47,7 @@ export function CalendarView() {
     const freeFood = searchParams.get("freeFood");
     const topic = searchParams.get("topic");
     const search = searchParams.get("search");
+    const school = searchParams.get("school");
 
     const from = new Date(month.getFullYear(), month.getMonth(), 1);
     const to = new Date(month.getFullYear(), month.getMonth() + 1, 1);
@@ -58,6 +59,7 @@ export function CalendarView() {
     if (freeFood) params.set("freeFood", freeFood);
     if (topic) params.set("topic", topic);
     if (search) params.set("search", search);
+    if (school) params.set("school", school);
 
     setLoading(true);
     fetch(`/api/events?${params}`)

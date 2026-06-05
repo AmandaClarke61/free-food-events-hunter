@@ -51,6 +51,9 @@ export async function GET(request: NextRequest) {
   const dateFrom = params.get("dateFrom") ?? undefined;
   const dateTo = params.get("dateTo") ?? undefined;
   const forYou = params.get("forYou") === "true";
+  const schoolParam = params.get("school");
+  const school =
+    schoolParam === "mit" || schoolParam === "harvard" ? schoolParam : undefined;
 
   // --- forYou branch: score all upcoming events and return sorted ---
   if (forYou) {
@@ -83,6 +86,7 @@ export async function GET(request: NextRequest) {
 
     // 3. Fetch all upcoming events (with optional filters)
     const where: Record<string, unknown> = {};
+    if (school) where.school = school;
     if (dateFrom || dateTo) {
       const range: Record<string, Date> = {};
       if (dateFrom) range.gte = dateToET(dateFrom);
@@ -160,6 +164,10 @@ export async function GET(request: NextRequest) {
   }
 
   const where: Record<string, unknown> = {};
+
+  if (school) {
+    where.school = school;
+  }
 
   if (freeFood) {
     where.hasFreeFood = true;

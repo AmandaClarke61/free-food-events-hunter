@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/db";
 import { RawEvent } from "@/lib/types";
-import { collectLocalist } from "@/collectors/localist";
+import {
+  collectLocalist,
+  collectHarvardCollege,
+  collectHarvardHBS,
+  collectHarvardSEAS,
+} from "@/collectors/localist";
 import { collectCampusGroups, collectSloanGroups } from "@/collectors/campusgroups";
 import { collectGSC } from "@/collectors/gsc-anno";
 import { collectCSAIL } from "@/collectors/csail";
@@ -17,6 +22,7 @@ type Collector = {
 };
 
 const COLLECTORS: Collector[] = [
+  // MIT
   { name: "localist", fn: collectLocalist },
   { name: "campusgroups", fn: collectCampusGroups },
   { name: "sloangroups", fn: collectSloanGroups },
@@ -26,6 +32,10 @@ const COLLECTORS: Collector[] = [
   { name: "medialab", fn: collectMediaLab },
   { name: "mitsloan", fn: collectMITSloan },
   { name: "bcs", fn: collectBCS },
+  // Harvard
+  { name: "harvard-college", fn: collectHarvardCollege },
+  { name: "harvard-hbs", fn: collectHarvardHBS },
+  { name: "harvard-seas", fn: collectHarvardSEAS },
 ];
 
 export async function runPipeline(sourceFilter?: string) {
@@ -85,6 +95,7 @@ export async function runPipeline(sourceFilter?: string) {
   let newCount = 0;
   for (const event of deduped) {
     const eventData = {
+      school: event.school,
       title: event.title,
       description: event.description,
       startTime: event.startTime,
