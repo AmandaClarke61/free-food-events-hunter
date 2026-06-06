@@ -20,7 +20,9 @@ export type EventSourceName =
   | "harvard-gazette"
   | "harvard-hsph"
   | "harvard-hds"
-  | "harvard-hgse";
+  | "harvard-hgse"
+  // Harvard (WordPress event RSS)
+  | "harvard-law";
 
 /** Unified event shape coming out of any collector */
 export interface RawEvent {

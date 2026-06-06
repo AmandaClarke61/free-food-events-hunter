@@ -12,6 +12,7 @@ import {
   collectHarvardHDS,
   collectHarvardHGSE,
 } from "@/collectors/ical";
+import { collectHarvardLaw } from "@/collectors/wp-rss";
 import { collectCampusGroups, collectSloanGroups } from "@/collectors/campusgroups";
 import { collectGSC } from "@/collectors/gsc-anno";
 import { collectCSAIL } from "@/collectors/csail";
@@ -46,6 +47,7 @@ const COLLECTORS: Collector[] = [
   { name: "harvard-hsph", fn: collectHarvardHSPH },
   { name: "harvard-hds", fn: collectHarvardHDS },
   { name: "harvard-hgse", fn: collectHarvardHGSE },
+  { name: "harvard-law", fn: collectHarvardLaw },
 ];
 
 export async function runPipeline(sourceFilter?: string) {
