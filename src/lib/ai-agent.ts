@@ -116,7 +116,7 @@ export async function processMessage(
   // Loop for tool calls (max 5 iterations)
   for (let i = 0; i < 5; i++) {
     const response = await getOpenAI().chat.completions.create({
-      model: "models/gemini-2.5-flash",
+      model: "gemini-2.5-flash",
       messages,
       tools: TOOLS,
       temperature: 0.3,

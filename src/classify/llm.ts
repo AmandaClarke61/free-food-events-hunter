@@ -103,7 +103,7 @@ export async function classifyWithLLM(
   try {
     const response = await retryWithBackoff(() =>
       openai.chat.completions.create({
-        model: "models/gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         temperature: 0,
         response_format: { type: "json_object" },
         messages: [
