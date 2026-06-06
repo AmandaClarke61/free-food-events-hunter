@@ -6,6 +6,12 @@ import {
   collectHarvardHBS,
   collectHarvardSEAS,
 } from "@/collectors/localist";
+import {
+  collectHarvardGazette,
+  collectHarvardHSPH,
+  collectHarvardHDS,
+  collectHarvardHGSE,
+} from "@/collectors/ical";
 import { collectCampusGroups, collectSloanGroups } from "@/collectors/campusgroups";
 import { collectGSC } from "@/collectors/gsc-anno";
 import { collectCSAIL } from "@/collectors/csail";
@@ -36,6 +42,10 @@ const COLLECTORS: Collector[] = [
   { name: "harvard-college", fn: collectHarvardCollege },
   { name: "harvard-hbs", fn: collectHarvardHBS },
   { name: "harvard-seas", fn: collectHarvardSEAS },
+  { name: "harvard-gazette", fn: collectHarvardGazette },
+  { name: "harvard-hsph", fn: collectHarvardHSPH },
+  { name: "harvard-hds", fn: collectHarvardHDS },
+  { name: "harvard-hgse", fn: collectHarvardHGSE },
 ];
 
 export async function runPipeline(sourceFilter?: string) {

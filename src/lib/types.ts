@@ -15,7 +15,12 @@ export type EventSourceName =
   // Harvard (Localist instances)
   | "harvard-college"
   | "harvard-hbs"
-  | "harvard-seas";
+  | "harvard-seas"
+  // Harvard (iCal feeds)
+  | "harvard-gazette"
+  | "harvard-hsph"
+  | "harvard-hds"
+  | "harvard-hgse";
 
 /** Unified event shape coming out of any collector */
 export interface RawEvent {
